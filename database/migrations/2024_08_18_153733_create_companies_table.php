@@ -11,14 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('companies', function (Blueprint $table): void {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('email')->unique();
             $table->string('website')->nullable();
             $table->string('address')->nullable();
             $table->text('description')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('phone')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->string('industry')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

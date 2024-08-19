@@ -3,62 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Application;
+use Illuminate\Support\Facades\Auth;
 
 class ApplicationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
     {
-        //
+        $user = Auth::user();
+        $applications = $user->applications()->with('job')->get();
+        return view('applications.index', compact('applications'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        $application = Application::findOrFail($id);
+        if($application->user_id !== Auth::id()) {
+            return redirect()->route('applications.index')->with('error', 'You do not have permission to view this application.');
+        }
+        return view('applications.show', compact('application'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $application = Application::findOrFail($id);
+        if($application->user_id !== Auth::id()) {
+            return redirect('applications.index')->with('error', 'You do not have permission to view this application.');
+        }
+        $application->delete();
+        return redirect()->route('applications.index')->with('success', 'Application deleted successfully.');
     }
 }

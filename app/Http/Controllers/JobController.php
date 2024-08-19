@@ -7,27 +7,21 @@ use App\Models\Job;
 
 class JobController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $jobs = Job::with('category')->where('is_active', true)->get();
-        return view('home', compact('jobs'));
+        $jobs = Job::latest()->take(10)->get();
+        return view('jobs.index', compact('jobs'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
-        $jobs = Job::findOrFail($id);
-        return view('jobs.show', ['job' => $jobs]);
-    }
-
-    public function list()
+    public function allJobs()
     {
         $jobs = Job::all();
-        return view('jobs.list', ['jobs' => $jobs]);
+        return view('jobs.all', compact('jobs'));
+    }
+
+    public function show($id)
+    {
+        $job = Job::findOrFail($id);
+        return view('jobs.show', compact('job'));
     }
 }
