@@ -4,13 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Job extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'my_jobs';
+
+    protected $fillable = [
+        'title',
+        'description',
+        'location',
+        'salary',
+        'job_type',
+        'status',
+        'requirements',
+        'company_id',
+        'category_id',
+        'application_deadline',
+        'experience_level',
+        'remote_possible',
+    ];
 
     public function user()
     {

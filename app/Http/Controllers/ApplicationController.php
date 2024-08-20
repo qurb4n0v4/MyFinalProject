@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Application;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +18,7 @@ class ApplicationController extends Controller
         return view('applications.index', compact('applications'));
     }
 
-    public function show(string $id)
+    public function show($id)
     {
         $application = Application::findOrFail($id);
         if($application->user_id !== Auth::id()) {
@@ -32,7 +31,7 @@ class ApplicationController extends Controller
     {
         $application = Application::findOrFail($id);
         if($application->user_id !== Auth::id()) {
-            return redirect('applications.index')->with('error', 'You do not have permission to view this application.');
+            return redirect()->route('applications.index')->with('error', 'You do not have permission to view this application.');
         }
         $application->delete();
         return redirect()->route('applications.index')->with('success', 'Application deleted successfully.');

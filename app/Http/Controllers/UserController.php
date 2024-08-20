@@ -82,6 +82,9 @@ class UserController extends Controller
     public function applications()
     {
         $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please log in to view your applications.');
+        }
         $applications = $user->applications()->with('job')->get();
         return view('user.applications.index', compact('applications'));
     }
@@ -137,5 +140,5 @@ class UserController extends Controller
         ]);
 
         return redirect()->route('user.applications.index')->with('success', 'Application added successfully.');
-    } ?
+    } //???????????????????????LOOK AT HEREEE
 }
