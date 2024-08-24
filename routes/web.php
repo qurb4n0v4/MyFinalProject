@@ -94,13 +94,30 @@ Route::prefix('company')->group(function() {
     });
 });
 
-Route::prefix('admin')->middleware('admin')->group(function() {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::resource('users', UserController::class)->except(['create', 'store']);
-    Route::resource('companies', CompanyController::class)->except(['create', 'store']);
-    Route::resource('categories', CategoryController::class);
-    Route::resource('jobs', JobController::class)->except(['create', 'store']);
+Route::prefix('admin')->name('admin.')->group(function() {
+    Route::group(['middleware' => ['prevent.login.access']], function() {
+        Route::get('/register', [AdminController::class, 'showRegisterForm'])->name('register');
+        Route::post('/register', [AdminController::class, 'register']);
+        Route::get('/login', [AdminController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [AdminController::class, 'login'])->name('login.submit');
+    });
+    Route::group(['middleware' => ['admin']], function() {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::post('/logout', [AdminController::class, 'logout'])->name('logout');
+        Route::get('/applications', [AdminController::class, 'applications'])->name('applications');
+//
+//         Route::resource('users', UserController::class)->except(['create', 'store']);
+//         Route::resource('companies', CompanyController::class)->except(['create', 'store']);
+//         Route::resource('categories', CategoryController::class);
+//         Route::resource('jobs', JobController::class)->except(['create', 'store']);
+    });
 });
+
+Route::get('/admin', function () {
+    return redirect()->route('admin.login');
+});
+
+
 
 Route::prefix('register')->group(function() {
     Route::get('/user', function () {
