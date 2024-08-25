@@ -52,6 +52,11 @@ Route::prefix('blogs')->group(function () {
 });
 
 Route::prefix('user')->group(function() {
+    Route::get('/login', [UserController::class, 'showLoginForm'])->name('user.login');
+    Route::post('/login', [UserController::class, 'login'])->name('user.login.post');
+    Route::get('/register', [UserController::class, 'showRegisterForm'])->name('user.register');
+    Route::post('/register', [UserController::class, 'register'])->name('user.register.post');
+    Route::post('/logout', [UserController::class, 'logout'])->name('user.logout');
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
     Route::get('/user/{id}', [UserController::class, 'show'])->name('user.show');
 
@@ -76,6 +81,11 @@ Route::prefix('user')->group(function() {
 });
 
 Route::prefix('company')->group(function() {
+    Route::get('/login', [CompanyController::class, 'showLoginForm'])->name('company.login');
+    Route::post('/login', [CompanyController::class, 'login']);
+    Route::get('/register', [CompanyController::class, 'showRegisterForm'])->name('company.register');
+    Route::post('/register', [CompanyController::class, 'register']);
+    Route::post('/logout', [CompanyController::class, 'logout'])->name('company.logout');
     Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('company.dashboard');
 
     Route::prefix('jobs')->group(function() {
@@ -119,29 +129,29 @@ Route::get('/admin', function () {
 
 
 
-Route::prefix('register')->group(function() {
-    Route::get('/user', function () {
-        return view('auth.register-user');
-    })->name('user.register');
-    Route::post('/user', [AuthController::class, 'registerUser'])->name('user.register.post');
-    Route::get('/company', function () {
-        return view('auth.register-company');
-    })->name('company.register');
-    Route::post('/company', [AuthController::class, 'registerCompany'])->name('company.register.post');
-});
+//Route::prefix('register')->group(function() {
+//    Route::get('/user', function () {
+//        return view('auth.register-user');
+//    })->name('user.register');
+//    Route::post('/user', [AuthController::class, 'registerUser'])->name('user.register.post');
+//    Route::get('/company', function () {
+//        return view('auth.register-company');
+//    })->name('company.register');
+//    Route::post('/company', [AuthController::class, 'registerCompany'])->name('company.register.post');
+//});
 
-Route::prefix('login')->group(function() {
-    Route::get('/user', function () {
-        return view('auth.login-user');
-    })->name('user.login');
-    Route::post('/user', [AuthController::class, 'loginUser'])->name('user.login.post');
-    Route::get('/company', function () {
-        return view('auth.login-company');
-    })->name('company.login');
-    Route::post('/company', [AuthController::class, 'loginCompany'])->name('company.login.post');
-});
+//Route::prefix('login')->group(function() {
+//    Route::get('/user', function () {
+//        return view('auth.login-user');
+//    })->name('user.login');
+//    Route::post('/user', [AuthController::class, 'loginUser'])->name('user.login.post');
+//    Route::get('/company', function () {
+//        return view('auth.login-company');
+//    })->name('company.login');
+//    Route::post('/company', [AuthController::class, 'loginCompany'])->name('company.login.post');
+//});
 
-Route::prefix('logout')->group(function() {
-    Route::post('/user', [AuthController::class, 'logoutUser'])->name('user.logout');
-    Route::post('/company', [AuthController::class, 'logoutCompany'])->name('company.logout');
-});
+//Route::prefix('logout')->group(function() {
+//    Route::post('/user', [AuthController::class, 'logoutUser'])->name('user.logout');
+//    Route::post('/company', [AuthController::class, 'logoutCompany'])->name('company.logout');
+//});

@@ -7,22 +7,66 @@ use App\Models\Company;
 use App\Models\Application;
 use App\Models\Category;
 use App\Models\Job;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 class CompanyController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
         $this->middleware('company')->only([
             'dashboard', 'createJob', 'storeJob', 'editJob', 'updateJob', 'destroyJob', 'applications'
         ]);
     }
 
+    public function showLoginForm()
+    {
+        return view('company.auth.login');
+    }
+
+    public function showRegisterForm()
+    {
+        return view('company.auth.register');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::guard('company')->attempt($credentials)) {
+            return redirect()->route('company.dashboard');
+        }
+
+        return back()->withErrors(['email' => 'Wrong email or password.']);
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:companies',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        Company::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('company.auth.login')->with('success', 'You have successfully registered your company! Please login');
+    }
+
+    public function logout()
+    {
+        Auth::guard('company')->logout();
+        return redirect()->route('company.auth.login');
+    }
+
     public function dashboard()
     {
-        // Şirketin dashboard'unu yöneten işlemler
         return view('companies.dashboard');
     }
 
@@ -163,10 +207,10 @@ class CompanyController extends Controller
         ]);
 
         $job = new Job($request->all());
-        $job->company_id = Auth::user()->company_id; // Şirket ID'sini güncel kullanıcının şirket ID'si ile ayarla
+        $job->company_id = Auth::user()->company_id;
         $job->save();
 
-        return redirect()->route('company.jobs.index')->with('success', 'İş ilanı başarıyla eklendi.');
+        return redirect()->route('company.jobs.index')->with('success', 'Job added successfully.');
     }
 
     public function jobs()
@@ -185,7 +229,7 @@ class CompanyController extends Controller
         $job = Job::findOrFail($id);
 
         if ($job->company_id != Auth::user()->company_id) {
-            return redirect()->route('company.jobs.index')->with('error', 'Bu iş ilanını düzenleme yetkiniz yok.');
+            return redirect()->route('company.jobs.index')->with('error', 'You do not have permission to edit this job.');
         }
 
         $categories = Category::all();
@@ -197,7 +241,7 @@ class CompanyController extends Controller
         $job = Job::findOrFail($id);
 
         if ($job->company_id != Auth::user()->company_id) {
-            return redirect()->route('company.jobs.index')->with('error', 'Bu iş ilanını güncelleme yetkiniz yok.');
+            return redirect()->route('company.jobs.index')->with('error', 'You do not have permission to edit this job.');
         }
 
         $request->validate([
@@ -216,7 +260,7 @@ class CompanyController extends Controller
 
         $job->update($request->all());
 
-        return redirect()->route('company.jobs.index')->with('success', 'İş ilanı başarıyla güncellendi.');
+        return redirect()->route('company.jobs.index')->with('success', 'Successfully updated job.');
     }
 
     public function destroyJob($id)
@@ -224,11 +268,11 @@ class CompanyController extends Controller
         $job = Job::findOrFail($id);
 
         if ($job->company_id != Auth::user()->company_id) {
-            return redirect()->route('company.jobs.index')->with('error', 'Bu iş ilanını silme yetkiniz yok.');
+            return redirect()->route('company.jobs.index')->with('error', 'You do not have permission to delete this job.');
         }
 
         $job->delete();
 
-        return redirect()->route('company.jobs.index')->with('success', 'İş ilanı başarıyla silindi.');
+        return redirect()->route('company.jobs.index')->with('success', 'Successfully deleted job.');
     }
 }

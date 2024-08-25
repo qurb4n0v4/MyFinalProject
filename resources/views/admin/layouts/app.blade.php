@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}" />
 {{--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>--}}
+
 </head>
 <body>
     <div class="container-scroller d-flex">

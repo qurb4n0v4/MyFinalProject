@@ -6,13 +6,62 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Application;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('user');
+        $this->middleware('user')->except(['showLoginForm', 'showRegisterForm', 'login', 'register']);
+    }
+
+    public function showLoginForm()
+    {
+        return view('auth.login-user');
+    }
+
+    public function showRegisterForm()
+    {
+        return view('auth.register-user');
+    }
+
+    public function login(Request $request)
+    {
+        $credectials = $request->only('email', 'password');
+
+        if (Auth::guard('user')->attempt($credectials)) {
+            return redirect()->route('user.dashboard');
+        }
+
+        return back()->withErrors(['email' => 'Wrong email or password!']);
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'dob' => 'required|date',
+            'gender' => 'required',
+        ]);
+
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+        $user->date_of_birth = $request->dob;
+        $user->gender = $request->gender;
+        $user->save();
+
+        return redirect()->route('user.login')->with('success', 'Registration successful. Please log in.');
+    }
+
+    public function logout()
+    {
+        Auth::guard('user')->logout();
+        return redirect()->route('user.login');
     }
 
     public function dashboard()
@@ -30,9 +79,9 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-//        if($user->id !== Auth::od()){
-//            return view('user.profile')->with('error', 'You can not view that profile.');
-//        }
+        if($user->id !== Auth::id()){
+            return view('user.profile')->with('error', 'You can not view that profile.');
+        }
         return view('user.profile', compact('user'));
     }
 
@@ -69,9 +118,10 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('profile_picture')) {
-            if ($user->profile_picture) {
-                Storage::delete($user->profile_picture);
+            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+                Storage::delete($user->profile_photo);
             }
+
             $path = $request->file('profile_picture')->store('profile_pictures', 'public');
             $user->update(['profile_picture' => $path]);
         }
@@ -124,10 +174,10 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        $existingApplication = $user->applications()->where('job_id', $job_id)->first();
+        $existingApplication = $user->applications()->where('job_id', $job_id)->exists();
 
         if ($existingApplication) {
-            return redirect()->route('user.applications.index')->with('error', 'You have already applied for this job');
+            return redirect()->route('user.applications.index')->with('error', 'You have already applied for this job.');
         }
 
         $request->validate([
