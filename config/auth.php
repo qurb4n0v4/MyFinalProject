@@ -11,9 +11,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'user' => [
+//        'user' => [
+//            'driver' => 'session',
+//            'provider' => 'users',
+//        ],
+        'company' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'companies',
         ],
         'admin' => [
             'driver' => 'session',
@@ -25,6 +29,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+        'companies' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Company::class,
         ],
         'admins' => [
             'driver' => 'eloquent',

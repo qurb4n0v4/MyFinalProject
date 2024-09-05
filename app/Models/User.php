@@ -11,6 +11,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
 
+    protected $guard = 'web';
+
     protected $fillable = [
         'name',
         'email',
@@ -29,16 +31,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'date_of_birth' => 'date',
-            'last_login_at' => 'datetime',
-            'is_active' => 'boolean',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'date_of_birth' => 'date',
+        'last_login_at' => 'datetime',
+        'is_active' => 'boolean',
+        'password' => 'hashed',
+    ];
     public function jobs()
     {
         return $this->hasMany(Job::class);

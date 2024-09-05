@@ -6,15 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('companies', function (Blueprint $table): void {
             $table->id();
             $table->string('name')->unique();
             $table->string('email')->unique();
+            $table->string('password');
             $table->string('website')->nullable();
             $table->string('address')->nullable();
             $table->text('description')->nullable();
@@ -27,9 +25,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('companies');

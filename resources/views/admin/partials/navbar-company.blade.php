@@ -20,10 +20,10 @@
             <span class="mdi mdi-menu"></span>
         </button>
         <div class="navbar-brand-wrapper">
-            <a class="navbar-brand brand-logo" href="{{ route('admin.dashboard') }}"><img src="{{ asset('images/logo.svg') }}" alt="logo"/></a>
-            <a class="navbar-brand brand-logo-mini" href="{{ route('admin.dashboard') }}"><img src="{{ asset('images/logo-mini.svg') }}" alt="logo"/></a>
+            <a class="navbar-brand brand-logo" href="{{ route('company.dashboard') }}"><img src="{{ asset('images/logo.svg') }}" alt="logo"/></a>
+            <a class="navbar-brand brand-logo-mini" href="{{ route('company.dashboard') }}"><img src="{{ asset('images/logo-mini.svg') }}" alt="logo"/></a>
         </div>
-        <h4 class="font-weight-bold mb-0 d-none d-md-block mt-1">Welcome back, {{ Auth::guard('admin')->user()->name }}</h4>
+        <h4 class="font-weight-bold mb-0 d-none d-md-block mt-1">Welcome back, {{ Auth::guard('company')->user()->name }}</h4>
         <ul class="navbar-nav navbar-nav-right">
             <li class="nav-item">
                 <h4 class="mb-0 font-weight-bold d-none d-xl-block">
@@ -33,8 +33,8 @@
             <li class="nav-item dropdown mr-1">
                 <a class="nav-link count-indicator dropdown-toggle d-flex justify-content-center align-items-center" id="messageDropdown" href="#" data-toggle="dropdown">
                     <i class="mdi mdi-calendar mx-0"></i>
-{{--                    <span class="count bg-info">2--}}
-{{--                    </span>--}}
+                    {{--                    <span class="count bg-info">2--}}
+                    {{--                    </span>--}}
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
                     <p class="mb-0 font-weight-normal float-left dropdown-header">Messages</p>
@@ -79,7 +79,7 @@
             <li class="nav-item dropdown mr-2">
                 <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center" id="notificationDropdown" href="#" data-toggle="dropdown">
                     <i class="mdi mdi-email-open mx-0"></i>
-{{--                    <span class="count bg-danger">1</span>--}}
+                    {{--                    <span class="count bg-danger">1</span>--}}
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
                     <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
@@ -140,8 +140,8 @@
         <ul class="navbar-nav navbar-nav-right">
             <li class="nav-item nav-profile dropdown">
                 <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-                    <img src="{{ asset('images/faces/faceAys.png') }}" alt="profile"/>
-                    <span class="nav-profile-name">{{ Auth::guard('admin')->user()->name }}</span>
+                    <img src="{{ asset('images/faces/faceCompany.png') }}" alt="profile"/>
+                    <span class="nav-profile-name">{{ Auth::guard('company')->user()->name }}</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
                     <a class="dropdown-item">
@@ -150,7 +150,7 @@
                     </a>
                     <a class="dropdown-item">
                         <i class="mdi mdi-logout text-primary"></i>
-                        <form method="POST" action="{{ route('admin.logout') }}">
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="btn-link">Logout</button>
                         </form>

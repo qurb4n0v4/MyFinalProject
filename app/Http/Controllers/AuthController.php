@@ -1,118 +1,132 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Redirect;
 use App\Models\User;
 use App\Models\Company;
 
 class AuthController extends Controller
 {
-    public function registerUser(Request $request)
+    public function showLoginForm()
     {
-        $validator = Validator::make($request->all(), [
+        if (Auth::guard('web')->check()) {
+            return redirect()->route('user.dashboard');
+        }elseif (Auth::guard('company')->check()) {
+            return redirect()->route('company.dashboard');
+        }
+        return view('auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'role' => 'required|in:user,company',
+        ]);
+
+        $guard = $request->role === 'user' ? 'web' : 'company';
+
+        if (Auth::guard($guard)->attempt($request->only('email', 'password'))) {
+            return redirect()->intended($guard === 'web' ? route('user.dashboard') : route('company.dashboard'));
+        }
+
+        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput($request->except('password'));
+    }
+
+    public function showRegisterForm()
+    {
+        if (Auth::guard('web')->check()) {
+            return redirect()->route('user.dashboard');
+        }elseif (Auth::guard('company')->check()) {
+            return redirect()->route('company.dashboard');
+        }
+        return view('auth.register');
+    }
+
+    protected function validator(array $data)
+    {
+        $rules = [
+            'role' => 'required|string|in:user,company',
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email|unique:companies,email',
             'password' => 'required|string|min:8|confirmed',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'resume' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
-            'gender' => 'nullable|in:male,female,other',
-            'date_of_birth' => 'nullable|date',
-        ]);
-        if($validator->fails()){
-            return Redirect::back()->withErrors($validator)->withInput();
-        }
-        $password = Hash::make($request->password);
+        ];
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $password,
-            'role' => 'user',
-            'profile_photo' => $request->profile_photo ? $request->file('profile_photo')->store('profile_photos') : null,
-            'resume' => $request->resume ? $request->file('resume')->store('resumes') : null,
-            'gender' => $request->gender,
-            'date_of_birth' => $request->date_of_birth,
-        ]);
-        return redirect()->route('user.login')->with('success', 'Registration Successful. Please check your email to activate your account.');
+        if ($data['role'] === 'user') {
+            $rules = array_merge($rules, [
+                'profile_photo' => 'nullable|image|max:2048',
+                'resume' => 'nullable|mimes:pdf,doc,docx|max:2048',
+                'gender' => 'nullable|string|in:male,female,other',
+                'date_of_birth' => 'nullable|date',
+                'address' => 'nullable|string|max:255',
+                'bio' => 'nullable|string',
+            ]);
+        }
+
+        if ($data['role'] === 'company') {
+            $rules = array_merge($rules, [
+                'website' => 'nullable|string|max:255',
+                'address' => 'nullable|string|max:255',
+                'description' => 'nullable|string',
+                'logo' => 'nullable|image|max:2048',
+                'phone' => 'nullable|string|max:20',
+                'industry' => 'nullable|string|max:255',
+            ]);
+        }
+
+        return Validator::make($data, $rules);
     }
 
-    public function registerCompany(Request $request)
+    protected function create(array $data)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:companies',
-            'email' => 'required|string|email|max:255|unique:companies',
-            'password' => 'required|string|min:8|confirmed',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'website' => 'nullable|url',
-            'address' => 'nullable|string',
-            'description' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'industry' => 'nullable|string',
-            'status' => 'nullable|in:active,inactive',
-        ]);
-        if($validator->fails()){
-            return Redirect::back()->withErrors($validator)->withInput();
+        if ($data['role'] === 'user') {
+            return User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'profile_photo' => $data['profile_photo'] ?? null,
+                'resume' => $data['resume'] ?? null,
+                'gender' => $data['gender'] ?? null,
+                'date_of_birth' => $data['date_of_birth'] ?? null,
+                'address' => $data['address'] ?? null,
+                'bio' => $data['bio'] ?? null,
+                'role' => 'user',
+            ]);
+        } elseif ($data['role'] === 'company') {
+            return Company::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'website' => $data['website'] ?? null,
+                'address' => $data['address'] ?? null,
+                'description' => $data['description'] ?? null,
+                'logo' => $data['logo'] ?? null,
+                'phone' => $data['phone'] ?? null,
+                'industry' => $data['industry'] ?? null,
+                'status' => $data['status'] ?? 'inactive',
+            ]);
         }
-        $password = Hash::make($request->password);
-
-        Company::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $password,
-            'logo' => $request->logo ? $request->file('logo')->store('logos') : null,
-            'website' => $request->website,
-            'address' => $request->address,
-            'description' => $request->description,
-            'phone' => $request->phone,
-            'industry' => $request->industry,
-            'status' => $request->status ?? 'active',
-        ]);
-        return redirect()->route('company.login')->with('success', 'Registration Successful. Please check your email to activate your account.');
     }
 
-    public function loginUser(Request $request)
+    public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6',
-        ]);
-        if($validator->fails()){
-            return Redirect::back()->withErrors($validator)->withInput();
-        }
-        if(auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->route('user.dashboard')->with('success', 'Login Successful.');
-        }
-        return Redirect::back()->withErrors(['email' => 'Email or password is not correct.'])->withInput();
+        $this->validator($request->all())->validate();
+
+        $user = $this->create($request->all());
+
+        auth()->login($user);
+
+        return view('auth.login');
     }
 
-    public function loginCompany(Request $request)
+    public function logout()
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6',
-        ]);
-        if($validator->fails()){
-            return Redirect::back()->withErrors($validator)->withInput();
-        }
-        if(auth()->guard('company')->attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->route('company.dashboard')->with('success', 'Login Successful.');
-        }
-        return Redirect::back()->withErrors(['email' => 'Email or password is not correct.'])->withInput();
-    }
-
-    public function logoutUser(Request $request)
-    {
-        auth()->logout();
-        return redirect()->route('home')->with('success', 'Logout Successful.');
-    }
-
-    public function logoutCompany(Request $request)
-    {
-        auth()->logout();
-        return redirect()->route('home')->with('success', 'Logout Successful.');
+        $guard = Auth::guard('web')->check() ? 'web' : 'company';
+        Auth::guard($guard)->logout();
+        return redirect()->route('login');
     }
 }

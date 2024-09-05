@@ -11,9 +11,9 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('admin')->check()) {
-            return $next($request);
+        if (!Auth::guard('admin')->check()) {
+            return redirect()->route('admin.login');
         }
-        return redirect()->route('admin.login')->withErrors(['auth' => 'You are not authorized to access this page.']);
+        return $next($request);
     }
 }

@@ -20,13 +20,14 @@ return new class extends Migration
             $table->string('resume')->nullable();
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->date('date_of_birth')->nullable();
+            $table->string('address')->nullable();
+            $table->text('bio')->nullable();
             $table->timestamp('last_login_at')->nullable();
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
         });
-
     }
 
     public function down(): void

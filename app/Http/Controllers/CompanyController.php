@@ -23,12 +23,18 @@ class CompanyController extends Controller
 
     public function showLoginForm()
     {
-        return view('company.auth.login');
+        if (Auth::guard('company')->check()) {
+            return view('company.dashboard');
+        }
+        return view('auth.login-company');
     }
 
     public function showRegisterForm()
     {
-        return view('company.auth.register');
+        if (Auth::guard('company')->check()) {
+            return view('company.dashboard');
+        }
+        return view('auth.register-company');
     }
 
     public function login(Request $request)
@@ -56,18 +62,18 @@ class CompanyController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('company.auth.login')->with('success', 'You have successfully registered your company! Please login');
+        return redirect()->route('company.login')->with('success', 'You have successfully registered your company! Please login');
     }
 
     public function logout()
     {
         Auth::guard('company')->logout();
-        return redirect()->route('company.auth.login');
+        return redirect()->route('company.login');
     }
 
     public function dashboard()
     {
-        return view('companies.dashboard');
+        return view('admin.dashboard.company');
     }
 
     public function create()

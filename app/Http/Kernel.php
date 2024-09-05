@@ -53,6 +53,5 @@ class Kernel extends HttpKernel
         'user' => \App\Http\Middleware\UserMiddleware::class,
         'company' => \App\Http\Middleware\CompanyMiddleware::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
-        'prevent.login.access' => \App\Http\Middleware\PreventLoginAccess::class,
     ];
 }

@@ -10,7 +10,8 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Basic Table</h4>
+                    <h4 class="card-title">Admin Dashboard</h4>
+                    <p>Welcome, {{ Auth::guard('admin')->name }}! This is your admin dashboard.</p>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>

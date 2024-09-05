@@ -6,62 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Application;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    public function __construct()
+     public function __construct()
     {
         $this->middleware('user')->except(['showLoginForm', 'showRegisterForm', 'login', 'register']);
-    }
-
-    public function showLoginForm()
-    {
-        return view('auth.login-user');
-    }
-
-    public function showRegisterForm()
-    {
-        return view('auth.register-user');
-    }
-
-    public function login(Request $request)
-    {
-        $credectials = $request->only('email', 'password');
-
-        if (Auth::guard('user')->attempt($credectials)) {
-            return redirect()->route('user.dashboard');
-        }
-
-        return back()->withErrors(['email' => 'Wrong email or password!']);
-    }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'dob' => 'required|date',
-            'gender' => 'required',
-        ]);
-
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->date_of_birth = $request->dob;
-        $user->gender = $request->gender;
-        $user->save();
-
-        return redirect()->route('user.login')->with('success', 'Registration successful. Please log in.');
-    }
-
-    public function logout()
-    {
-        Auth::guard('user')->logout();
-        return redirect()->route('user.login');
     }
 
     public function dashboard()
@@ -70,17 +21,17 @@ class UserController extends Controller
         return view('user.dashboard', compact('user'));
     }
 
-    public function profile()
-    {
-        $user = Auth::user();
-        return view('user.profile', compact('user'));
-    }
+//    public function profile()
+//    {
+//        $user = Auth::user();
+//        return view('user.profile', compact('user'));
+//    }
 
     public function show($id)
     {
         $user = User::findOrFail($id);
-        if($user->id !== Auth::id()){
-            return view('user.profile')->with('error', 'You can not view that profile.');
+        if ($user->id !== Auth::id()) {
+            return redirect()->route('user.profile')->with('error', 'You cannot view that profile.');
         }
         return view('user.profile', compact('user'));
     }
@@ -100,13 +51,13 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'gender' => 'nullable|string|max:10',
+            'address' => 'nullable|string|max:255',
+            'bio' => 'nullable|string|max:500',
             'resume' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255'
         ]);
 
-        $user->update($request->only(['name', 'email', 'phone', 'gender', 'resume', 'address']));
-
-        return redirect()->route('user.profile')->with('success', 'Profile updated successfully');
+        $user->update($request->only(['name', 'email', 'phone', 'gender', 'address', 'bio', 'resume']));
+        return redirect()->route('user.profile')->with('success', 'Profile updated successfully.');
     }
 
     public function updatePicture(Request $request)
@@ -119,11 +70,11 @@ class UserController extends Controller
 
         if ($request->hasFile('profile_picture')) {
             if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
-                Storage::delete($user->profile_photo);
+                Storage::disk('public')->delete($user->profile_photo);
             }
 
             $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $user->update(['profile_picture' => $path]);
+            $user->update(['profile_photo' => $path]);
         }
 
         return redirect()->route('user.profile')->with('success', 'Profile picture updated successfully');
@@ -190,5 +141,5 @@ class UserController extends Controller
         ]);
 
         return redirect()->route('user.applications.index')->with('success', 'Application added successfully.');
-    } //???????????????????????LOOK AT HEREEE
+    }
 }

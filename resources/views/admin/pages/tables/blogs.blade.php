@@ -1,5 +1,7 @@
 @extends('admin.layouts.app')
-@section('title', 'Tables')
+
+@section('title', 'Applications')
+
 @section('content')
     <div class="content-wrapper">
         <div class="row">
