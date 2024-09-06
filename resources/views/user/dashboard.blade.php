@@ -1,3 +1,59 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<style>
+        .img-account-profile {
+            height: 10rem;
+        }
+        .rounded-circle {
+            border-radius: 50% !important;
+        }
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+        }
+        .card .card-header {
+            font-weight: 500;
+        }
+        .card-header:first-child {
+            border-radius: 0.35rem 0.35rem 0 0;
+        }
+        .card-header {
+            padding: 1rem 1.35rem;
+            margin-bottom: 0;
+            background-color: rgba(33, 40, 50, 0.03);
+            border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+        }
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.875rem 1.125rem;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1;
+            color: #69707a;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #c5ccd6;
+            border-radius: 0.35rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .nav-borders .nav-link.active {
+            color: #0061f2;
+            border-bottom-color: #0061f2;
+        }
+        .nav-borders .nav-link {
+            color: #69707a;
+            border-bottom-width: 0.125rem;
+            border-bottom-style: solid;
+            border-bottom-color: transparent;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+</style>
 @extends('layouts.app')
 
 @section('content')
@@ -10,7 +66,6 @@
                 <span class="sep"> > </span>
                 <a href="{{ route('user.jobs.index') }}">Jobs</a>
                 <span class="sep"> > </span>{{ Auth::user()->name }}
-
             </p>
         </div>
     </div>
@@ -18,204 +73,78 @@
     <div class="site-section bg-light">
         <div class="container">
             <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            Update your profile
-                        </div>
+                <!-- Sidebar for Profile Picture -->
+                <div class="col-md-3 d-none d-md-block mt-5 pt-2">
+                    <div class="card mb-4 text-center">
                         <div class="card-body">
-                            <form action="{{ route('user.updateProfile') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
-
-                                <div class="form-group">
-                                    <label for="address">Address</label>
-                                    <input type="text" class="form-control{{ $errors->has('address') ? ' is-invalid' : '' }}" name="address" value="{{ old('address', Auth::user()->address) }}">
-                                    @if ($errors->has('address'))
-                                        <div style="color:red">
-                                            <p class="mb-0">{{ $errors->first('address') }}</p>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                <div class="form-group mt-3">
-                                    <label for="phone">Phone number</label>
-                                    <input type="text" class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" name="phone" value="{{ old('phone', Auth::user()->phone) }}">
-                                    @if ($errors->has('phone'))
-                                        <div style="color:red">
-                                            <p class="mb-0">{{ $errors->first('phone') }}</p>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                <div class="form-group mt-3">
-                                    <label for="bio">Bio</label>
-                                    <textarea name="bio" id="bio" style="height: 120px" class="form-control{{ $errors->has('bio') ? ' is-invalid' : '' }}" cols="30" rows="10">{{ old('bio', Auth::user()->bio) }}</textarea>
-                                    @if ($errors->has('bio'))
-                                        <div style="color:red">
-                                            <p class="mb-0">{{ $errors->first('bio') }}</p>
-                                        </div>
-                                    @endif
-                                </div>
-
-                                <div class="form-group mt-3">
-                                    <button class="btn btn-success">Update</button>
-                                </div>
-
-                                @if (Session::has('message'))
-                                    <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">
-                                        <strong>Wow awesome!</strong> {{ Session::get('message') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
-                            </form>
+                            @if (!empty(Auth::guard('web')->user()->profile_photo))
+                                <img src="{{ asset('uploads/avatar') }}/{{ Auth::user()->profile_photo }}" style="width:100px; height:100px; border-radius:100px; object-fit: cover;" class="border mb-3" alt="">
+                            @else
+                                <img src="https://i.pravatar.cc/150" style="width:100px; height:100px; border-radius:100px;" class="border mb-3" alt="">
+                            @endif
+                            <h5 class="card-title">{{ Auth::user()->name }}</h5>
+                            <p class="card-text">{{ Auth::user()->email }}</p>
                         </div>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button class="btn btn-danger w-100">Logout</button>
+                        </form>
                     </div>
                 </div>
 
-                <div class="col-md-4">
-{{--                    <form action="{{ route('user.updatePicture') }}" method="POST" enctype="multipart/form-data">--}}
-{{--                        @csrf--}}
-{{--                        @method('PUT')--}}
+                <!-- Main Content Area -->
+                <div class="col-md-9">
+                    <!-- Tab navigation -->
+                    <ul class="nav nav-tabs" id="profile-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">Profile</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="applied-jobs-tab" data-bs-toggle="tab" href="#applied-jobs" role="tab" aria-controls="applied-jobs" aria-selected="false">Applied Jobs</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="saved-jobs-tab" data-bs-toggle="tab" href="#saved-jobs" role="tab" aria-controls="saved-jobs" aria-selected="false">Saved Jobs</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="edit-profile-tab" data-bs-toggle="tab" href="#edit-profile" role="tab" aria-controls="edit-profile" aria-selected="false">Edit Profile</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">Settings</a>
+                        </li>
+                    </ul>
 
-{{--                        <div class="card">--}}
-{{--                            <div class="card-header mb-3">--}}
-{{--                                Avatar--}}
-{{--                            </div>--}}
-{{--                            @if (!empty(Auth::guard('web')->user()->profile_photo))--}}
-{{--                                <img src="{{ asset('uploads/avatar') }}/{{ Auth::user()->profile_photo }}" style="width:100px; height:100px; border-radius:100px; object-fit: cover; margin:0px auto" class="border mb-3" alt="">--}}
-{{--                            @else--}}
-{{--                                <img src="https://i.pravatar.cc/150" style="width:100px; border-radius:100px; margin:0px auto" class="border mb-3" alt="">--}}
-{{--                            @endif--}}
-{{--                            <div class="card-body p-0 text-center">--}}
-{{--                                <input type="file" class="form-control{{ $errors->has('avatar') ? ' is-invalid' : '' }}" name="avatar">--}}
-{{--                                <button class="btn btn-success w-100 mt-3">Update</button>--}}
-{{--                                @if ($errors->has('avatar'))--}}
-{{--                                    <div style="color:red">--}}
-{{--                                        <p class="mb-0">{{ $errors->first('avatar') }}</p>--}}
-{{--                                    </div>--}}
-{{--                                @endif--}}
-{{--                                @if (Session::has('avatar'))--}}
-{{--                                    <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">--}}
-{{--                                        {{ Session::get('avatar') }}--}}
-{{--                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>--}}
-{{--                                    </div>--}}
-{{--                                @endif--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </form>--}}
+                    <!-- Tab content -->
+                    <div class="tab-content mt-3" id="profile-tabs-content">
+                        <!-- Profile Tab -->
 
+                            @include('.user.profile.profile')
 
+                        <!-- Applied Jobs Tab -->
 
-                    <form action="{{ route('user.updatePicture') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
+                            @include('.user.applications.index')
 
-                        <div class="card">
-                            <div class="card-header mb-3">
-                                Avatar
-                            </div>
-                            @if (!empty(Auth::guard('web')->user()->profile_photo))
-                                <img src="{{ asset('storage') }}/{{ Auth::user()->profile_photo }}" style="width:100px; height:100px; border-radius:100px; object-fit: cover; margin:0px auto" class="border mb-3" alt="">
-                            @else
-                                <img src="https://i.pravatar.cc/150" style="width:100px; border-radius:100px; margin:0px auto" class="border mb-3" alt="">
-                            @endif
-                            <div class="card-body p-0 text-center">
-                                <input type="file" class="form-control{{ $errors->has('profile_picture') ? ' is-invalid' : '' }}" name="profile_picture">
-                                <button class="btn btn-success w-100 mt-3">Update</button>
-                                @if ($errors->has('profile_picture'))
-                                    <div style="color:red">
-                                        <p class="mb-0">{{ $errors->first('profile_picture') }}</p>
-                                    </div>
-                                @endif
-                                @if (Session::has('avatar'))
-                                    <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">
-                                        {{ Session::get('avatar') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
+                        <!-- Saved Jobs Tab -->
 
+                            @include('.user.jobs.saved_jobs')
 
+                        <!-- Edit Profile Tab -->
 
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            Your info
-                        </div>
-                        <div class="card-body">
-                            <p>Name:  <strong class="badge bg-secondary badge-primary">{{ Auth::user()->name }}</strong></p>
-                            <p>Email: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->email }}</strong></p>
-                            <p>Phone number: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->phone }}</strong></p>
-                            <p>Address: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->address }}</strong></p>
-                            <p>Gender: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->gender }}</strong></p>
-                            <p>Bio: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->bio }}</strong></p>
-                            <p>Member On: <strong class="badge bg-secondary badge-primary">{{ date('F d Y', strtotime(Auth::user()->created_at)) }}</strong></p>
-                            @if (!empty(Auth::guard('web')->user()->resume))
-                                <p>Download resume: <strong class="badge bg-info badge-primary"><a class="text-white" target="_blank" href="{{ url('storage/'.Auth::guard('web')->user()->resume) }}"> Resume</a></strong></p>
-                            @endif
-                        </div>
-                    </div>
+                            @include('.user.profile.editProfile')
 
-                    <form action="" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                Update Cover Letter
-                            </div>
-                            <div class="card-body">
-                                <input type="file" class="form-control{{ $errors->has('cover_letter') ? ' is-invalid' : '' }}" name="cover_letter">
-                                <button class="btn btn-success mt-3">Update</button>
-                                @if (Session::has('coverletter'))
-                                    <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">
-                                        <strong>Wow!</strong> {{ Session::get('coverletter') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
-                                @if ($errors->has('cover_letter'))
-                                    <div style="color:red">
-                                        <p class="mb-0">{{ $errors->first('cover_letter') }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
+                        <!-- Settings Tab -->
 
-                    <form action="" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                Update Resume
-                            </div>
-                            <div class="card-body">
-                                <input type="file" class="form-control{{ $errors->has('resume') ? ' is-invalid' : '' }}" name="resume">
-                                <button class="btn btn-success mt-3">Update</button>
-                                @if (Session::has('resume'))
-                                    <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">
-                                        <strong>Wow!</strong> {{ Session::get('resume') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
-                                @if ($errors->has('resume'))
-                                    <div style="color:red">
-                                        <p class="mb-0">{{ $errors->first('resume') }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
+                            @include('.user.profile.settings')
 
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button class="btn btn-danger w-100">Logout</button>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Include Bootstrap JS (if not already included) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
+
+
