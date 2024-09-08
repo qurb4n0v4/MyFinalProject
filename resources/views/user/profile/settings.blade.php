@@ -7,22 +7,22 @@
             <div class="card-header mb-3">
                 Avatar
             </div>
-            @if (!empty(Auth::guard('web')->user()->profile_photo))
-                <img src="{{ asset('uploads/avatar') }}/{{ Auth::user()->profile_photo }}" style="width:100px; height:100px; border-radius:100px; object-fit: cover; margin:0px auto" class="border mb-3" alt="">
+            @if (Auth::user()->profile_photo)
+                <img src="{{ asset('storage/userUploads/' . Auth::user()->profile_photo) }}" alt="Profile Picture" style="width:100px; height:100px; object-fit: cover; display: block; margin: 0 auto;">
             @else
-                <img src="https://i.pravatar.cc/150" style="width:100px; border-radius:100px; margin:0px auto" class="border mb-3" alt="">
-            @endif
+                <img src="https://ps.w.org/user-avatar-reloaded/assets/icon-256x256.png?rev=2540745" alt="Default Profile Picture" style="width:100px; height:100px; display: block; margin: 0 auto;">
+            @endif <br>
             <div class="card-body p-0 text-center">
-                <input type="file" class="form-control{{ $errors->has('avatar') ? ' is-invalid' : '' }}" name="avatar">
+                <input type="file" class="form-control{{ $errors->has('profile_picture') ? ' is-invalid' : '' }}" name="profile_picture">
                 <button class="btn btn-success w-100 mt-3">Update</button>
-                @if ($errors->has('avatar'))
+                @if ($errors->has('profile_picture'))
                     <div style="color:red">
-                        <p class="mb-0">{{ $errors->first('avatar') }}</p>
+                        <p class="mb-0">{{ $errors->first('profile_picture') }}</p>
                     </div>
                 @endif
-                @if (Session::has('avatar'))
+                @if (Session::has('success'))
                     <div class="alert alert-success mt-3 alert-dismissible fade show" role="alert">
-                        {{ Session::get('avatar') }}
+                        {{ Session::get('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif

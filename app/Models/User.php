@@ -17,13 +17,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
         'profile_photo',
         'resume',
+        'address',
         'gender',
-        'date_of_birth',
-        'last_login_at',
-        'is_active',
+        'bio',
+        'resume',
     ];
 
     protected $hidden = [
@@ -49,5 +48,10 @@ class User extends Authenticatable
     public function blog()
     {
         return $this->hasmany(Blog::class);
+    }
+
+    public function company()
+    {
+        return $this->hasOne(Company::class);
     }
 };

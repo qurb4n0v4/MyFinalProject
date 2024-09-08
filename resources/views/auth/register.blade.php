@@ -1,7 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
+    <section class="banner-area relative" id="home">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">
+                        Sign Up
+                    </h1>
+                    <p class="text-white link-nav"><a href="index.html">Home </a>  <span class="lnr lnr-arrow-right"></span>  <a href="about-us.html"> Sign Up</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="container py-5 col-lg-6">
         <h2>Register</h2>
         <form method="POST" action="{{ route('register.post') }}" enctype="multipart/form-data">
             @csrf

@@ -17,63 +17,21 @@ class CompanyController extends Controller
     public function __construct()
     {
         $this->middleware('company')->only([
-            'dashboard', 'createJob', 'storeJob', 'editJob', 'updateJob', 'destroyJob', 'applications'
+            'dashboard', 'updateProfile', 'createJob', 'storeJob', 'editJob', 'updateJob', 'destroyJob', 'applications'
         ]);
-    }
-
-    public function showLoginForm()
-    {
-        if (Auth::guard('company')->check()) {
-            return view('company.dashboard');
-        }
-        return view('auth.login-company');
-    }
-
-    public function showRegisterForm()
-    {
-        if (Auth::guard('company')->check()) {
-            return view('company.dashboard');
-        }
-        return view('auth.register-company');
-    }
-
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::guard('company')->attempt($credentials)) {
-            return redirect()->route('company.dashboard');
-        }
-
-        return back()->withErrors(['email' => 'Wrong email or password.']);
-    }
-
-    public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:companies',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        Company::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect()->route('company.login')->with('success', 'You have successfully registered your company! Please login');
-    }
-
-    public function logout()
-    {
-        Auth::guard('company')->logout();
-        return redirect()->route('company.login');
     }
 
     public function dashboard()
     {
-        return view('admin.dashboard.company');
+        $company = Auth::guard('company')->user();
+
+        $totalJobs = $company->jobs()->count();
+        $totalApplications = Application::where('company_id', $company->id)->count();
+        $newApplications = Application::where('company_id', $company->id)->whereDate('created_at', today())->count();
+        $recentJobs = $company->jobs()->latest()->limit(5)->get();
+        $recentApplications = Application::where('company_id', $company->id)->latest()->limit(5)->get();
+
+        return view('admin.dashboard.company', compact('totalJobs', 'totalApplications', 'newApplications', 'recentJobs', 'recentApplications'));
     }
 
     public function create()
@@ -81,11 +39,34 @@ class CompanyController extends Controller
         return view('companies.create');
     }
 
-    public function store(Request $request)
+    public function profile()
     {
+        $company = Auth::guard('company')->user();
+        return view('admin.pages.profile.profile-company', compact('company'));
+    }
+
+    public function showUpdateProfile($id)
+    {
+        $company = Company::findOrFail($id);
+
+        if ($company->user_id != Auth::id()) {
+            return redirect()->route('company.dashboard')->with('error', 'You do not have permission to view this company.');
+        }
+
+        return view('admin.pages.profile.edit-profile', compact('company'));
+    }
+
+    public function updateProfile(Request $request, $id)
+    {
+        $company = Auth::guard('company')->user();
+
+        if ($company->id != $id) {
+            return redirect()->route('company.dashboard')->with('error', 'You do not have permission to update this company.');
+        }
+
         $request->validate([
-            'name' => 'required|string|max:255|unique:companies',
-            'email' => 'required|string|email|max:255|unique:companies',
+            'name' => 'required|string|max:255|unique:companies,name,' . $company->id,
+            'email' => 'required|string|email|max:255|unique:companies,email,' . $company->id,
             'website' => 'nullable|url',
             'address' => 'nullable|string|max:255',
             'description' => 'nullable|string',
@@ -95,17 +76,22 @@ class CompanyController extends Controller
             'industry' => 'nullable|string|max:255',
         ]);
 
-        $company = new Company($request->all());
+        $company->fill($request->except('logo'));
 
         if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('company_logos', 'public');
-            $company->logo = $path;
+            if ($company->logo) {
+                Storage::delete('public/companyUploads/' . $company->logo);
+            }
+
+            $file = $request->file('logo');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/companyUploads', $filename);
+            $company->logo = $filename;
         }
 
-        $company->user_id = Auth::id();
         $company->save();
 
-        return redirect()->route('company.dashboard')->with('success', 'Company created successfully.');
+        return redirect()->route('company.dashboard')->with('success', 'Company updated successfully.');
     }
 
     public function show($id)
@@ -128,41 +114,6 @@ class CompanyController extends Controller
         }
 
         return view('companies.edit', compact('company'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $company = Company::findOrFail($id);
-
-        if ($company->user_id != Auth::id()) {
-            return redirect()->route('company.dashboard')->with('error', 'You do not have permission to update this company.');
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255|unique:companies,name,' . $company->id,
-            'email' => 'required|string|email|max:255|unique:companies,email,' . $company->id,
-            'website' => 'nullable|url',
-            'address' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'phone' => 'nullable|string|max:20',
-            'status' => 'required|in:active,inactive',
-            'industry' => 'nullable|string|max:255',
-        ]);
-
-        $company->fill($request->except('logo'));
-
-        if ($request->hasFile('logo')) {
-            if ($company->logo) {
-                Storage::delete($company->logo);
-            }
-            $path = $request->file('logo')->store('company_logos', 'public');
-            $company->logo = $path;
-        }
-
-        $company->save();
-
-        return redirect()->route('company.dashboard')->with('success', 'Company updated successfully.');
     }
 
     public function destroy($id)

@@ -38,6 +38,48 @@ class AdminController extends Controller
         return view('admin.dashboard.admin');
     }
 
+    public function profile() {
+        return view('admin.pages.profile.profile');
+    }
+
+    public function showUpdateProfile()
+    {
+        $admin = Auth::guard('admin')->user();
+        return view('admin.pages.profile.editProfile', compact('admin'));
+    }
+
+    public function updateProfile(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:admins,email,' . $id,
+            'phone' => 'nullable|string|max:20',
+            'gender' => 'nullable|string|in:male,female,other',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $admin = Admin::findOrFail($id);
+
+        $admin->name = $request->name;
+        $admin->email = $request->email;
+        $admin->phone = $request->phone;
+        $admin->gender = $request->gender;
+
+        if ($request->hasFile('profile_picture')) {
+            if ($admin->profile_picture && Storage::exists('adminUploads/' . $admin->profile_picture)) {
+                Storage::delete('adminUploads/' . $admin->profile_picture);
+            }
+
+            $fileName = time() . '_' . $request->file('profile_picture')->getClientOriginalName();
+            $request->file('profile_picture')->storeAs('adminUploads', $fileName, 'public');
+            $admin->profile_picture = $fileName;
+        }
+
+        $admin->save();
+
+        return redirect()->route('admin.profile')->with('success', 'Profile updated successfully.');
+    }
+
     public function users()
     {
         if (Auth::guard('admin')->check()) {

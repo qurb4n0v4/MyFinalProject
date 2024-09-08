@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('job_id');
+            $table->unsignedBigInteger('company_id');
             $table->text('cover_letter')->nullable();
             $table->enum('status', ['pending', 'reviewed', 'accepted', 'rejected'])->default('pending');
             $table->string('resume')->nullable();
@@ -25,6 +26,7 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('job_id')->references('id')->on('my_jobs')->onDelete('cascade');
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
         });
     }
 

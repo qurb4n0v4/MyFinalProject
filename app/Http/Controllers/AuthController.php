@@ -127,6 +127,6 @@ class AuthController extends Controller
     {
         $guard = Auth::guard('web')->check() ? 'web' : 'company';
         Auth::guard($guard)->logout();
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 }

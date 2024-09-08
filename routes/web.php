@@ -1,16 +1,25 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
 
-Route::get('/', [JobController::class, 'index'])->name('home');
+Route::get('/home', function () {
+    return view('home');
+})->name('home');
+
+Route::get('/contact', function () {
+    return view('partials.contact');
+});
+
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Job Prefix Routes
 Route::prefix('jobs')->group(function () {
@@ -60,9 +69,12 @@ Route::prefix('blogs')->group(function () {
 // Company Prefix Routes
 Route::prefix('company')->name('company.')->group(function () {
     Route::group(['middleware' => ['company']], function () {
+        Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('dashboard');
+        Route::get('/profile', [CompanyController::class, 'profile'])->name('profile');
         Route::get('/jobs', [CompanyController::class, 'jobs'])->name('jobs');
         Route::get('/applications', [CompanyController::class, 'applications'])->name('applications');
-        Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('dashboard');
+        Route::get('/update-profile/{id}', [CompanyController::class, 'showUpdateProfile'])->name('showUpdateProfile');
+        Route::put('/update-profile/{id}', [CompanyController::class, 'updateProfile'])->name('updateProfile');
     });
 });
 
@@ -74,6 +86,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::group(['middleware' => ['admin']], function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::prefix('/profile')->group(function () {
+            Route::get('/', [AdminController::class, 'profile'])->name('profile');
+            Route::get('/update/{id}', [AdminController::class, 'showUpdateProfile'])->name('showUpdateProfile');
+            Route::put('/update/{id}', [AdminController::class, 'updateProfile'])->name('updateProfile');
+        });
         Route::get('/users', [AdminController::class, 'users'])->name('users');
         Route::get('/jobs', [AdminController::class, 'jobs'])->name('jobs');
         Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
@@ -94,7 +111,6 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::get('/user/{id}', [UserController::class, 'show'])->name('show');
 
         Route::prefix('profile')->group(function () {
-            Route::get('/', [UserController::class, 'profile'])->name('profile');
             Route::get('/edit', [UserController::class, 'editProfile'])->name('editProfile');
             Route::put('/update', [UserController::class, 'updateProfile'])->name('updateProfile');
             Route::put('/update-picture', [UserController::class, 'updatePicture'])->name('updatePicture');

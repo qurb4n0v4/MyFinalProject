@@ -1,13 +1,23 @@
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<style>
-        .img-account-profile {
-            height: 10rem;
-        }
-        .rounded-circle {
-            border-radius: 50% !important;
-        }
+@extends('layouts.app')
+
+@section('content')
+    <section class="banner-area relative" id="home">
+        <div class="overlay overlay-bg"></div>
+        <div class="container">
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="about-content col-lg-12">
+                    <h1 class="text-white">Dashboard</h1>
+                    <p class="text-white link-nav">
+                        <a href="/home">Home</a>
+                        <span class="lnr lnr-arrow-right"></span>
+                        <a href="{{ route('user.dashboard') }}"> {{ Auth::user()->name }}</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
         .card {
             box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
         }
@@ -53,34 +63,27 @@
             margin-left: 1rem;
             margin-right: 1rem;
         }
-</style>
-@extends('layouts.app')
 
-@section('content')
-    <div style="height: 95px;"></div>
-    <div class="unit-5 overlay" style="background-image: url({{ asset('external/images/hero_2.jpg') }})">
-        <div class="container text-center">
-            <h1 class="mb-0" style="color: #fff; font-size: 2.5rem;">Profile</h1>
-            <p class="mb-0 unit-6">
-                <a href="/">Home</a>
-                <span class="sep"> > </span>
-                <a href="{{ route('user.jobs.index') }}">Jobs</a>
-                <span class="sep"> > </span>{{ Auth::user()->name }}
-            </p>
-        </div>
-    </div>
+        /* Initially hide all tabs except Profile */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.show {
+            display: block;
+        }
+    </style>
 
-    <div class="site-section bg-light">
+    <div class="site-section bg-light py-5">
         <div class="container">
             <div class="row">
                 <!-- Sidebar for Profile Picture -->
                 <div class="col-md-3 d-none d-md-block mt-5 pt-2">
                     <div class="card mb-4 text-center">
                         <div class="card-body">
-                            @if (!empty(Auth::guard('web')->user()->profile_photo))
-                                <img src="{{ asset('uploads/avatar') }}/{{ Auth::user()->profile_photo }}" style="width:100px; height:100px; border-radius:100px; object-fit: cover;" class="border mb-3" alt="">
+                            @if (Auth::user()->profile_photo)
+                                <img src="{{ asset('storage/userUploads/' . Auth::user()->profile_photo) }}" alt="Profile Picture" style="width:100px; height:100px; object-fit: cover; display: block; margin: 0 auto;">
                             @else
-                                <img src="https://i.pravatar.cc/150" style="width:100px; height:100px; border-radius:100px;" class="border mb-3" alt="">
+                                <img src="https://ps.w.org/user-avatar-reloaded/assets/icon-256x256.png?rev=2540745" alt="Default Profile Picture" style="width:100px; height:100px; display: block; margin: 0 auto;">
                             @endif
                             <h5 class="card-title">{{ Auth::user()->name }}</h5>
                             <p class="card-text">{{ Auth::user()->email }}</p>
@@ -117,26 +120,21 @@
 
                     <!-- Tab content -->
                     <div class="tab-content mt-3" id="profile-tabs-content">
-                        <!-- Profile Tab -->
-
+                        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                             @include('.user.profile.profile')
-
-                        <!-- Applied Jobs Tab -->
-
+                        </div>
+                        <div class="tab-pane fade" id="applied-jobs" role="tabpanel" aria-labelledby="applied-jobs-tab">
                             @include('.user.applications.index')
-
-                        <!-- Saved Jobs Tab -->
-
+                        </div>
+                        <div class="tab-pane fade" id="saved-jobs" role="tabpanel" aria-labelledby="saved-jobs-tab">
                             @include('.user.jobs.saved_jobs')
-
-                        <!-- Edit Profile Tab -->
-
+                        </div>
+                        <div class="tab-pane fade" id="edit-profile" role="tabpanel" aria-labelledby="edit-profile-tab">
                             @include('.user.profile.editProfile')
-
-                        <!-- Settings Tab -->
-
+                        </div>
+                        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                             @include('.user.profile.settings')
-
+                        </div>
                     </div>
                 </div>
             </div>
@@ -145,6 +143,35 @@
 
     <!-- Include Bootstrap JS (if not already included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize tabs
+            var tabElements = document.querySelectorAll('.nav-link');
+            var tabContentElements = document.querySelectorAll('.tab-pane');
+
+            tabElements.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    var targetId = this.getAttribute('href');
+
+                    tabContentElements.forEach(function (content) {
+                        if (content.id === targetId.substring(1)) {
+                            content.classList.add('show');
+                        } else {
+                            content.classList.remove('show');
+                        }
+                    });
+                });
+            });
+
+            // Show only the Profile tab by default
+            tabContentElements.forEach(function (content) {
+                if (content.id === 'profile') {
+                    content.classList.add('show');
+                } else {
+                    content.classList.remove('show');
+                }
+            });
+        });
+    </script>
 @endsection
-
-

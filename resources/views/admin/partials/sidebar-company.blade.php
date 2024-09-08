@@ -26,12 +26,6 @@
                 <span class="menu-title">Applications</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link ajax-link" href="">
-                <i class="mdi mdi-account menu-icon"></i>
-                <span class="menu-title">Profile</span>
-            </a>
-        </li>
         <li class="nav-item sidebar-category">
             <p>Settings</p>
             <span></span>
@@ -39,12 +33,13 @@
         <li class="nav-item">
             <a class="nav-link ajax-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
                 <i class="mdi mdi-account menu-icon"></i>
-                <span class="menu-title">Settings</span>
+                <span class="menu-title">Profile</span>
                 <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="auth">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"> <a class="nav-link" href="../../pages/samples/login.html"> Profile Settings </a></li>
+                    <li class="nav-item"> <a class="nav-link" href="{{ route('company.profile') }}"> View Profile </a></li>
+                    <li class="nav-item"> <a class="nav-link" href="{{ route('company.updateProfile', ['id' => Auth::guard('company')->user()->id]) }}"> Edit Profile </a></li>
                 </ul>
             </div>
         </li>

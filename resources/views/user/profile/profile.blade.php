@@ -7,7 +7,6 @@
         <div class="card-body">
             <p>Name:  <strong class="badge bg-secondary badge-primary">{{ Auth::user()->name }}</strong></p>
             <p>Email: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->email }}</strong></p>
-            <p>Phone number: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->phone }}</strong></p>
             <p>Address: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->address }}</strong></p>
             <p>Gender: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->gender }}</strong></p>
             <p>Bio: <strong class="badge bg-secondary badge-primary">{{ Auth::user()->bio }}</strong></p>

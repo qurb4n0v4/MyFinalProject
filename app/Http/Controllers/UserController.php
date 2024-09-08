@@ -21,12 +21,6 @@ class UserController extends Controller
         return view('user.dashboard', compact('user'));
     }
 
-//    public function profile()
-//    {
-//        $user = Auth::user();
-//        return view('user.profile', compact('user'));
-//    }
-
     public function show($id)
     {
         $user = User::findOrFail($id);
@@ -57,7 +51,7 @@ class UserController extends Controller
         ]);
 
         $user->update($request->only(['name', 'email', 'phone', 'gender', 'address', 'bio', 'resume']));
-        return redirect()->route('user.profile')->with('success', 'Profile updated successfully.');
+        return redirect()->route('user.dashboard')->with('success', 'Profile updated successfully.');
     }
 
     public function updatePicture(Request $request)
@@ -65,19 +59,18 @@ class UserController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->hasFile('profile_picture')) {
-            if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
-                Storage::disk('public')->delete($user->profile_photo);
-            }
-
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $user->update(['profile_photo' => $path]);
+            $file = $request->file('profile_picture');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/userUploads', $filename);  // Bu satır doğru
+            $user->profile_photo = $filename; // Yalnızca dosya adını kaydedin
+            $user->save();
         }
 
-        return redirect()->route('user.profile')->with('success', 'Profile picture updated successfully');
+        return redirect()->back()->with('success', 'Profile photo updated successfully');
     }
 
     public function applications()
