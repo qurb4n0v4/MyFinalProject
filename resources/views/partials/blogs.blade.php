@@ -58,44 +58,24 @@
         <div class="row d-flex justify-content-center">
             <div class="col-lg-12">
                 <div class="row">
-                    <div class="col-lg-4 col-md-6 d-flex justify-content-center">
-                        <div class="single-blog">
-                            <img src="{{ asset('img/blog.jpg') }}" alt="Blog Image">
-                            <div class="blog-info">
-                                <p class="publish-date">Sep 10, 2024</p>
-                                <a href="blog-details.html" class="blog-title">
-                                    <h4>The Ultimate Guide to Creative Design</h4>
-                                </a>
+                    @foreach($blogs as $blog)
+                        <div class="col-lg-4 col-md-6 d-flex justify-content-center">
+                            <div class="single-blog">
+                                <img src="{{ asset('img/' . $blog->featured_image) }}" alt="Blog Image">
+                                <div class="blog-info">
+                                    <p class="publish-date">{{ $blog->published_at ? $blog->published_at->format('M d, Y') : 'Date not available' }}</p>
+                                    <a href="{{ route('blogs.show', $blog->id) }}" class="blog-title">
+                                        <h4>{{ $blog->title }}</h4>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 d-flex justify-content-center">
-                        <div class="single-blog">
-                            <img src="{{ asset('img/blog.jpg') }}" alt="Blog Image">
-                            <div class="blog-info">
-                                <p class="publish-date">Sep 12, 2024</p>
-                                <a href="blog-details.html" class="blog-title">
-                                    <h4>Top 10 Design Trends for 2024</h4>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 d-flex justify-content-center">
-                        <div class="single-blog">
-                            <img src="{{ asset('img/blog.jpg') }}" alt="Blog Image">
-                            <div class="blog-info">
-                                <p class="publish-date">Sep 15, 2024</p>
-                                <a href="blog-details.html" class="blog-title">
-                                    <h4>How to Improve Your Creative Workflow</h4>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
         <div class="row d-flex justify-content-center mt-5">
-            <a href="{{ route('categories.index') }}" class="btn btn-primary">Read all blog posts >></a>
+            <a href="{{ route('blogs.index') }}" class="btn btn-primary">Read all blog posts >></a>
         </div>
     </div>
 </section>

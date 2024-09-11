@@ -1,11 +1,11 @@
 <style>
     .popular-post {
-        bottom: -50px; /* Popüler postu banner'ın altına yerleştir */
-        left: 50%; /* Sol kenardan %50 uzaklaştır */
-        transform: translateX(-50%); /* Ortalamak için kaydır */
-        width: 100%; /* Genişliği ayarla, istersen daha küçük de yapabilirsin */
+        bottom: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
         display: flex;
-        justify-content: center; /* İçeriği yatayda merkezle */
+        justify-content: center;
     }
 </style>
 @extends('layouts.app')

@@ -15,8 +15,8 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::all();
-        return view('categories.index', compact('categories'));
+        $categories = Category::orderBy('created_at', 'desc')->get();
+        return view('partials.feature-category', compact('categories'));
     }
 
     public function create()

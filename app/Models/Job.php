@@ -31,6 +31,12 @@ class Job extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function savedUsers()
+    {
+        return $this->belongsToMany(User::class, 'saved_jobs', 'job_id', 'user_id')->withTimestamps();
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class);
@@ -39,6 +45,7 @@ class Job extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
     public function applications()
     {
         return $this->hasMany(Application::class);

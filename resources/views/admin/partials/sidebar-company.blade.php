@@ -15,13 +15,13 @@
             <span></span>
         </li>
         <li class="nav-item">
-            <a class="nav-link ajax-link" href="{{ route('company.jobs') }}">
+            <a class="nav-link ajax-link" href="{{ route('company.jobs.index') }}">
                 <i class="mdi mdi-briefcase menu-icon"></i>
                 <span class="menu-title">My Jobs</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link ajax-link" href="{{ route('company.applications') }}">
+            <a class="nav-link ajax-link" href="">
                 <i class="mdi mdi-file-document menu-icon"></i>
                 <span class="menu-title">Applications</span>
             </a>

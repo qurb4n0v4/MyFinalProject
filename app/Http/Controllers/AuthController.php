@@ -116,11 +116,9 @@ class AuthController extends Controller
     {
         $this->validator($request->all())->validate();
 
-        $user = $this->create($request->all());
+        $this->create($request->all());
 
-        auth()->login($user);
-
-        return view('auth.login');
+        return redirect()->route('login');
     }
 
     public function logout()

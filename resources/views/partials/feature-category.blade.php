@@ -21,7 +21,7 @@
         box-shadow: 0 0 0 3px rgba(57, 90, 122, 0.45); /* Fokus için yeşil tonlu gölge */
     }
 </style>
-<section id="category" class="feature-cat-area pt-100" id="category">
+<section id="category" class="feature-cat-area pt-100">
     <div class="container">
         <div class="row d-flex justify-content-center">
             <div class="menu-content pb-60 col-lg-10">
@@ -32,57 +32,23 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <div class="single-fcat">
-                    <a href="category.html">
-                        <img src="img/o1.png" alt="Accounting">
-                    </a>
-                    <p>Accounting</p>
+            @forelse($categories as $category)
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <div class="single-fcat">
+                        <a href="{{ route('categories.show', $category->id) }}">
+                            <img src="{{ asset('storage/adminUploads/category' . $category->image) }}" alt="{{ $category->name }}">
+                        </a>
+                        <p>{{ $category->name }}</p>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <div class="single-fcat">
-                    <a href="category.html">
-                        <img src="img/o2.png" alt="Development">
-                    </a>
-                    <p>Development</p>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <div class="single-fcat">
-                    <a href="category.html">
-                        <img src="img/o3.png" alt="Technology">
-                    </a>
-                    <p>Technology</p>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <div class="single-fcat">
-                    <a href="category.html">
-                        <img src="img/o4.png" alt="Media & News">
-                    </a>
-                    <p>Media & News</p>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <div class="single-fcat">
-                    <a href="category.html">
-                        <img src="img/o5.png" alt="Medical">
-                    </a>
-                    <p>Medical</p>
-                </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6">
-                <div class="single-fcat">
-                    <a href="category.html">
-                        <img src="img/o6.png" alt="Government">
-                    </a>
-                    <p>Government</p>
-                </div>
-            </div>
+            @empty
+                <p>No categories available.</p>
+            @endforelse
         </div>
         <div class="row d-flex justify-content-center mt-5">
             <a href="{{ route('categories.index') }}" class="btn btn-primary">View All >></a>
         </div>
     </div>
 </section>
+
+

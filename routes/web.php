@@ -10,16 +10,16 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\HomeController;
 
-Route::get('/home', function () {
-    return view('home');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/contact', function () {
     return view('partials.contact');
 });
 
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 
 // Job Prefix Routes
 Route::prefix('jobs')->group(function () {
@@ -71,8 +71,13 @@ Route::prefix('company')->name('company.')->group(function () {
     Route::group(['middleware' => ['company']], function () {
         Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('dashboard');
         Route::get('/profile', [CompanyController::class, 'profile'])->name('profile');
-        Route::get('/jobs', [CompanyController::class, 'jobs'])->name('jobs');
-        Route::get('/applications', [CompanyController::class, 'applications'])->name('applications');
+        Route::get('/jobs', [CompanyController::class, 'jobs'])->name('jobs.index');
+        Route::get('/jobs/create', [CompanyController::class, 'createJob'])->name('jobs.create');
+        Route::post('/jobs/store', [CompanyController::class, 'storeJob'])->name('jobs.store');
+        Route::get('/jobs/{id}/show', [CompanyController::class, 'showJob'])->name('jobs.show');
+        Route::get('/jobs/{id}/edit', [CompanyController::class, 'editJob'])->name('jobs.edit');
+        Route::delete('/jobs/{id}', [CompanyController::class, 'destroyJob'])->name('jobs.destroy');
+        Route::get('/{companyId}/applications', [CompanyController::class, 'applications'])->name('applications.index');
         Route::get('/update-profile/{id}', [CompanyController::class, 'showUpdateProfile'])->name('showUpdateProfile');
         Route::put('/update-profile/{id}', [CompanyController::class, 'updateProfile'])->name('updateProfile');
     });
@@ -86,17 +91,47 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::group(['middleware' => ['admin']], function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
         Route::prefix('/profile')->group(function () {
             Route::get('/', [AdminController::class, 'profile'])->name('profile');
             Route::get('/update/{id}', [AdminController::class, 'showUpdateProfile'])->name('showUpdateProfile');
             Route::put('/update/{id}', [AdminController::class, 'updateProfile'])->name('updateProfile');
         });
+
+        Route::prefix('/categories')->name('category.')->group(function () {
+            Route::get('/', [AdminController::class, 'categories'])->name('index');
+            Route::get('/create', [AdminController::class, 'createCategory'])->name('create');
+            Route::post('/store', [AdminController::class, 'storeCategory'])->name('store');
+            Route::get('/{id}', [AdminController::class, 'showCategory'])->name('show');
+            Route::get('/{id}/edit', [AdminController::class, 'editCategory'])->name('edit');
+            Route::put('/{id}', [AdminController::class, 'updateCategory'])->name('update');
+            Route::delete('/{id}', [AdminController::class, 'deleteCategory'])->name('destroy');
+        });
+
         Route::get('/users', [AdminController::class, 'users'])->name('users');
-        Route::get('/jobs', [AdminController::class, 'jobs'])->name('jobs');
-        Route::get('/categories', [AdminController::class, 'categories'])->name('categories');
-        Route::get('/companies', [AdminController::class, 'companies'])->name('companies');
+        Route::prefix('/users')->name('user.')->group(function () {
+            Route::get('/', [AdminController::class, 'indexUser'])->name('index');
+            Route::get('/{id}', [AdminController::class, 'showUser'])->name('show');
+            Route::delete('/{id}', [AdminController::class, 'destroyUser'])->name('delete');
+        });
+
+        Route::prefix('/blogs')->name('blog.')->group(function () {
+            Route::get('/', [AdminController::class, 'blogs'])->name('index');
+            Route::get('/{id}', [AdminController::class, 'showBlog'])->name('show');
+            Route::get('/create', [AdminController::class, 'createBlog'])->name('create');
+            Route::post('/', [AdminController::class, 'storeBlog'])->name('store');
+            Route::get('/{id}/edit', [AdminController::class, 'editBlog'])->name('edit');
+            Route::put('/{id}', [AdminController::class, 'updateBlog'])->name('update');
+            Route::delete('/{id}', [AdminController::class, 'deleteBlog'])->name('delete');
+        });
+
+        Route::get('/jobs', [AdminController::class, 'jobs'])->name('jobs.index');
+        Route::get('/categories', [AdminController::class, 'categories'])->name('categories.index');
+        Route::get('/companies', [AdminController::class, 'companies'])->name('companies.index');
+        Route::get('/companies/{id}', [AdminController::class, 'showCompany'])->name('companies.show');
+        Route::delete('/companies/{id}', [AdminController::class, 'destroyCompany'])->name('companies.destroy');
         Route::get('/applications', [AdminController::class, 'applications'])->name('applications');
-        Route::get('/blogs', [AdminController::class, 'blogs'])->name('blogs');
+        Route::delete('/message/{id}', [AdminController::class, 'deleteMessage'])->name('message.delete');
     });
 });
 
@@ -118,7 +153,8 @@ Route::prefix('user')->name('user.')->group(function () {
 
         Route::prefix('jobs')->group(function () {
             Route::get('/', [UserController::class, 'jobs'])->name('jobs.index');
-            Route::post('/{job_id}/apply', [UserController::class, 'applyJob'])->name('jobs.apply');
+            Route::post('/save/{job}', [UserController::class, 'saveJob'])->name('jobs.save');
+            Route::post('/unsave/{job}', [UserController::class, 'unsaveJob'])->name('jobs.unsave');
             Route::get('/{id}', [JobController::class, 'show'])->name('jobs.show');
         });
     });
@@ -131,5 +167,9 @@ Route::prefix('auth')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+
+Route::get('/blog', function () {
+    return view('admin.pages.blogs.create');
 });
 

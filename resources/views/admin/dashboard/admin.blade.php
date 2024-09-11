@@ -1,169 +1,108 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Admin Dashboard')
 
 @section('content')
+
     <div class="page-header">
-        <h3 class="page-title">Dashboard</h3>
+        <h3 class="page-title"> Admin Dashboard </h3>
     </div>
+
     <div class="row">
-        <div class="col-lg-12 grid-margin stretch-card">
-            <div class="card">
+        <!-- Kullanıcı Sayısı Kartı -->
+        <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <h4 class="card-title">Admin Dashboard</h4>
-                    <p>Welcome, {{ Auth::guard('admin')->name }}! This is your admin dashboard.</p>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Office</th>
-                                <th>Age</th>
-                                <th>Start date</th>
-                                <th>Salary</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="images/faces/face1.jpg" alt="image"/>
-                                </td>
-                                <td>
-                                    Herman Beck
-                                </td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </td>
-                                <td>
-                                    $ 77.99
-                                </td>
-                                <td>
-                                    May 15, 2015
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="images/faces/face2.jpg" alt="image"/>
-                                </td>
-                                <td>
-                                    Messsy Adam
-                                </td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </td>
-                                <td>
-                                    $245.30
-                                </td>
-                                <td>
-                                    July 1, 2015
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="images/faces/face3.jpg" alt="image"/>
-                                </td>
-                                <td>
-                                    John Richards
-                                </td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </td>
-                                <td>
-                                    $138.00
-                                </td>
-                                <td>
-                                    Apr 12, 2015
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="images/faces/face4.jpg" alt="image"/>
-                                </td>
-                                <td>
-                                    Peter Meggik
-                                </td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </td>
-                                <td>
-                                    $ 77.99
-                                </td>
-                                <td>
-                                    May 15, 2015
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="images/faces/face5.jpg" alt="image"/>
-                                </td>
-                                <td>
-                                    Edward
-                                </td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </td>
-                                <td>
-                                    $ 160.25
-                                </td>
-                                <td>
-                                    May 03, 2015
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="images/faces/face6.jpg" alt="image"/>
-                                </td>
-                                <td>
-                                    John Doe
-                                </td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-info" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </td>
-                                <td>
-                                    $ 123.21
-                                </td>
-                                <td>
-                                    April 05, 2015
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="images/faces/face7.jpg" alt="image"/>
-                                </td>
-                                <td>
-                                    Henry Tom
-                                </td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </td>
-                                <td>
-                                    $ 150.00
-                                </td>
-                                <td>
-                                    June 16, 2015
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <h3 class="mb-2">Total Users</h3>
+                    <h1 class="mb-4">{{ $totalUsers }}</h1>
+                    <p><i class="mdi mdi-account-multiple"></i> Active Users: {{ $activeUsers }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Şirket Sayısı Kartı -->
+        <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h3 class="mb-2">Total Companies</h3>
+                    <h1 class="mb-4">{{ $totalCompanies }}</h1>
+                    <p><i class="mdi mdi-domain"></i> Verified Companies: {{ $verifiedCompanies }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- İş İlanları Sayısı Kartı -->
+        <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h3 class="mb-2">Total Jobs</h3>
+                    <h1 class="mb-4">{{ $totalJobs }}</h1>
+                    <p><i class="mdi mdi-briefcase"></i> Active Jobs: {{ $activeJobs }}</p>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <!-- Başvuru Sayısı Kartı -->
+        <div class="col-md-4 stretch-card grid-margin">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h3 class="mb-2">Total Applications</h3>
+                    <h1 class="mb-4">{{ $totalApplications }}</h1>
+                    <p><i class="mdi mdi-file-document"></i> Pending Applications: {{ $pendingApplications }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Son Başvurular Listesi -->
+        <div class="col-md-8 stretch-card grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Recent Job Applications</h4>
+                    <ul class="list-group">
+                        @foreach ($recentApplications as $application)
+                            <li class="list-group-item">
+                                <strong>{{ $application->user->name }}</strong> applied for
+                                <strong>{{ $application->job->title }}</strong>
+                                on {{ $application->created_at->format('Y-m-d') }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Şirketlerden Gelen Son Mesajlar -->
+        <div class="col-md-12 stretch-card grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Latest Messages from Companies</h4>
+                    @foreach ($recentMessages as $message)
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $message->name ?? 'Unknown Company' }}</h5>
+                                <p class="card-text">
+                                    <strong>Message:</strong> "{{ \Illuminate\Support\Str::limit($message->message, 50) }}"
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">Sent on {{ $message->created_at->format('F d, Y') }}</small>
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <form action="{{ route('admin.message.delete', $message->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection

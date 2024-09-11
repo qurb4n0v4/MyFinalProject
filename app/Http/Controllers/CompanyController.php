@@ -53,7 +53,7 @@ class CompanyController extends Controller
             return redirect()->route('company.dashboard')->with('error', 'You do not have permission to view this company.');
         }
 
-        return view('admin.pages.profile.edit-profile', compact('company'));
+        return view('admin.pages.profile.editProfile-company', compact('company'));
     }
 
     public function updateProfile(Request $request, $id)
@@ -138,13 +138,14 @@ class CompanyController extends Controller
         }
 
         $applications = Application::whereIn('job_id', $company->jobs->pluck('id'))->get();
-        return view('companies.applications.index', compact('company', 'applications'));
+
+        return view('company.applications.index', compact('company', 'applications'));
     }
 
     public function createJob()
     {
         $categories = Category::all();
-        return view('jobs.create', compact('categories'));
+        return view('company.jobs.create', compact('categories'));
     }
 
     public function storeJob(Request $request)
@@ -163,22 +164,36 @@ class CompanyController extends Controller
             'remote_possible' => 'required|boolean',
         ]);
 
-        $job = new Job($request->all());
-        $job->company_id = Auth::user()->company_id;
-        $job->save();
+        if (Auth::guard('company')->check()) {
+            $company = Auth::guard('company')->user();
 
-        return redirect()->route('company.jobs.index')->with('success', 'Job added successfully.');
+            if ($company) {
+                $job = new Job($request->all());
+                $job->company_id = $company->id;
+                $job->save();
+
+                return redirect()->route('company.jobs.index')->with('success', 'Job added successfully.');
+            } else {
+                return redirect()->back()->with('error', 'Company not found for the current user.');
+            }
+        } else {
+            return redirect()->back()->with('error', 'You must be logged in as a company to add a job.');
+        }
     }
-
     public function jobs()
     {
-        $user = Auth::user();
-        $company = $user->company;
+        $company = Auth::guard('company')->user();
         if (!$company) {
             return redirect()->route('home')->with('error', 'Unauthorized access');
         }
         $jobs = $company->jobs;
-        return view('companies.jobs.index', compact('jobs'));
+        return view('company.jobs.index', compact('jobs'));
+    }
+
+    public function showJob($id)
+    {
+        $job = Job::where('id', $id)->where('company_id', Auth::guard('company')->user()->id)->firstOrFail();
+        return view('company.jobs.show', compact('job'));
     }
 
     public function editJob($id)
@@ -222,14 +237,14 @@ class CompanyController extends Controller
 
     public function destroyJob($id)
     {
-        $job = Job::findOrFail($id);
+        $job = Job::find($id);
 
-        if ($job->company_id != Auth::user()->company_id) {
-            return redirect()->route('company.jobs.index')->with('error', 'You do not have permission to delete this job.');
+        if (!$job) {
+            return redirect()->back()->withErrors('Job not found.');
         }
 
         $job->delete();
 
-        return redirect()->route('company.jobs.index')->with('success', 'Successfully deleted job.');
+        return redirect()->route('company.jobs.index')->with('success', 'Job deleted successfully.');
     }
 }

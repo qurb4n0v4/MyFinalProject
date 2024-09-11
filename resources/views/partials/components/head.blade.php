@@ -11,6 +11,8 @@
     <meta name="keywords" content="">
     <!-- meta character set -->
     <meta charset="UTF-8">
+    <!-- meta csrf token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Site Title -->
     <title>JobSearch</title>
 

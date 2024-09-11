@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Applications')
+@section('title', 'Jobs')
 
 @section('content')
     <div class="col-lg-12 grid-margin stretch-card">

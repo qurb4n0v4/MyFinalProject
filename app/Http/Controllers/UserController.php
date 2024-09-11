@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Application;
+use App\Models\Job; // Job modelini dahil ettik
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
         $this->middleware('user')->except(['showLoginForm', 'showRegisterForm', 'login', 'register']);
     }
@@ -18,7 +19,10 @@ class UserController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        return view('user.dashboard', compact('user'));
+        $applications = $user->applications()->with('job')->get();
+        $savedJobs = $user->savedJobs;
+
+        return view('user.dashboard', compact('user', 'applications', 'savedJobs'));
     }
 
     public function show($id)
@@ -65,8 +69,8 @@ class UserController extends Controller
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/userUploads', $filename);  // Bu satır doğru
-            $user->profile_photo = $filename; // Yalnızca dosya adını kaydedin
+            $file->storeAs('public/userUploads', $filename);
+            $user->profile_photo = $filename; // Dosya adını kaydediyoruz
             $user->save();
         }
 
@@ -135,4 +139,31 @@ class UserController extends Controller
 
         return redirect()->route('user.applications.index')->with('success', 'Application added successfully.');
     }
+
+    public function saveJob(Request $request, $jobId)
+    {
+        $job = Job::find($jobId);
+        if (!$job) {
+            return response()->json(['message' => 'Job not found'], 404);
+        }
+
+        $user = Auth::user();
+        $user->savedJobs()->attach($jobId);
+
+        return response()->json(['message' => 'Job saved successfully']);
+    }
+
+    public function unsaveJob(Request $request, $jobId)
+    {
+        $job = Job::find($jobId);
+        if (!$job) {
+            return response()->json(['message' => 'Job not found'], 404);
+        }
+
+        $user = Auth::user();
+        $user->savedJobs()->detach($jobId);
+
+        return response()->json(['message' => 'Job unsaved successfully']);
+    }
+
 }

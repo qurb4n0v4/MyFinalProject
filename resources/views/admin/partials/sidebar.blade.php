@@ -15,25 +15,25 @@
             <span></span>
         </li>
         <li class="nav-item">
-            <a class="nav-link ajax-link" href="{{ route('admin.users') }}">
+            <a class="nav-link ajax-link" href="{{ route('admin.user.index') }}">
                 <i class="mdi mdi-account-group menu-icon"></i>
                 <span class="menu-title">Users</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link ajax-link" href="{{ route('admin.jobs') }}">
+            <a class="nav-link ajax-link" href="{{ route('admin.jobs.index') }}">
                 <i class="mdi mdi-briefcase menu-icon"></i>
                 <span class="menu-title">Jobs</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link ajax-link" href="{{ route('admin.categories') }}">
+            <a class="nav-link ajax-link" href="{{ route('admin.categories.index') }}">
                 <i class="mdi mdi-tag-multiple menu-icon"></i>
                 <span class="menu-title">Categories</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link ajax-link" href="">
+            <a class="nav-link ajax-link" href="{{ route('admin.companies.index') }}">
                 <i class="mdi mdi-office-building menu-icon"></i>
                 <span class="menu-title">Companies</span>
             </a>
@@ -45,7 +45,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link ajax-link" href="{{ route('admin.blogs') }}">
+            <a class="nav-link ajax-link" href="{{ route('admin.blog.index') }}">
                 <i class="mdi mdi-newspaper menu-icon"></i>
                 <span class="menu-title">Blogs</span>
             </a>
